@@ -1,0 +1,13 @@
+CVS
+pdf
+ps
+tex
+.DS_Store
+___*
+*.o
+*.so
+*.dylib
+*.a
+*.dSYM
+*junk*
+Makefile
