@@ -244,9 +244,15 @@ Simultaneous operations with images
     |
     
 #.  Occasionally, diffusion data is acquired with multiple repetitions
-    of DWIs.  For example, one might acquire three repetitions of 3
-    *b*\=0 images and 30 *b*\=1000 images, for a total of 99 volumes;
-    and then the 4th, 37th and 70th bricks have been acquired with the
-    same gradient, etc. However, you don't need to do the index math,
-    because ``1dDW_Grad_o_Mat`` can be told to do the averaging among
-    gradients.
+    of DWIs.  For example, one might acquire three repetitions of 4
+    *b*\=0 images and 30 *b*\=1000 images, for a total of 102 volumes;
+    in that case, the 5th, 39th and 73rd bricks will have been
+    acquired with the same gradient, etc. However, *you*, the
+    analyzer, don't need to do the index math, because
+    ``1dDW_Grad_o_Mat`` can be told to do the appropriate averaging
+    among gradients (along with the averaging of the reference images,
+    described in the previous section).
+
+    
+
+
