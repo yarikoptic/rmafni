@@ -33,8 +33,8 @@ discussed here allow one to semi-automate these averaging processes
 (as well as check that averaging is really feasible) while
 appropriately updating gradient information.
 
-.. note:: Below, when refering to DW factors, the assumed units of the
-          *b*\-values are always: :math:`{\rm s~mm}^{-2}`.
+.. note:: Below, when referring to DW factors, the assumed units of
+          the *b*\-values are always: :math:`{\rm s~mm}^{-2}`.
 
 |
 
@@ -127,8 +127,8 @@ remain the same, including the distinctions in row- or diagonal-first
 notations.  Of note, TORTOISE uses and outputs a *row-first* *b*\-matrix.
 
 
-Operations
-==========
+Operations (1dDW_Grad_o_Mat)
+============================
 
 Gradient and matrix information
 -------------------------------
@@ -344,16 +344,37 @@ Flipping Gradients (if necessary)
 
     |
 
-#.  The solution: flip back! ``1dDW_Grad_o_Mat`` contains switches to
-    flip each component (even if one is using matrix formats instead
-    of gradients, these apply): ``-flip_x``, ``-flip_y``, and
-    ``-flip_z``.  These can be applied individually (mathematically in
-    DTI/HARDI models, flipping any two grads simultaneously is
-    equivalent to flipping the third, due to the sign change symmetry
-    noted at the beginning of this section).  At least this means that
-    only a few combinations need to be tested.
+#.  The solution: flip back against the system! ``1dDW_Grad_o_Mat``
+    contains switches to flip each component (even if one is using
+    matrix formats instead of gradients, these apply): ``-flip_x``,
+    ``-flip_y``, and ``-flip_z``.  These can be applied individually
+    (mathematically in DTI/HARDI models, flipping any two grads
+    simultaneously is equivalent to flipping the third, due to the
+    sign change symmetry noted at the beginning of this section).  At
+    least this means that only a few combinations need to be tested.
 
-    How do you know:
+#.  This then begs the questions, how do you know:
     
     * when you need to perform flipping, and
     * when you have found the correct flipping to do with your data?
+
+    Answer: my preferred method is a visual inspection of a basic,
+    whole brain deterministic tractography tracts.  If the whole brain
+    mask is called *mask.nii.gz* and the DT parameters are prefixed
+    with *DTI/DT*, then this could be calculated and viewed from a
+    commandline with::
+
+      3dTrackID -mode DET -mask mask.nii.gz -netrois mask.nii.gz    \
+           -dti_in DTI/DT -logic OR -prefix DTI/o.WB
+      suma -tract DTI/o.WB_000.niml.tract
+
+    Below are sets of images from (bad) data in need of each potential
+    kind of flip, as well as a (good) data which has been properly
+    flipped.
+
+    .. image:: _FlipGrads/UNFLIPPED_1.jpg
+       :width: 30%
+    .. image:: _FlipGrads/UNFLIPPED_2.jpg
+       :width: 30%
+    .. image:: _FlipGrads/UNFLIPPED_3.jpg
+       :width: 30%
