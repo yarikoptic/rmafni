@@ -33,6 +33,11 @@ discussed here allow one to semi-automate these averaging processes
 (as well as check that averaging is really feasible) while
 appropriately updating gradient information.
 
+.. note:: Below, when refering to DW factors, the assumed units of the
+          *b*\-values are always: :math:`{\rm s~mm}^{-2}`.
+
+|
+
 Diffusion gradients
 -------------------
 
@@ -97,7 +102,7 @@ The standard AFNI style is 'diagonal first':
 .. math::
    G_{xx}, G_{yy}, G_{zz}, G_{xy}, G_{xz}, G_{yz},
 
-while, for example, the TORTOISE output style is 'row first' (and
+while, for example, another output style is 'row first' (and
 explicitly includes the factors of two from the symmetry of the
 off-diagonals):
 
@@ -119,13 +124,129 @@ with the spatial directionality in a single expression, the
 where every component of the above dyadic matrix, **G**, is simply multiplied
 by the DW factor, *b*.  All the other notations, symmetries and relations
 remain the same, including the distinctions in row- or diagonal-first
-notations.
+notations.  Of note, TORTOISE uses and outputs a *row-first* *b*\-matrix.
 
 
-Operating on gradients and DWIs
-===============================
+Operations
+==========
 
-The relevant format (row or column gradient, row- or diagonal-first
-matrix) can be converted among each other using ``1dDW_Grad_o_Mat``.
+Gradient and matrix information
+-------------------------------
 
 
+#.  The relevant formats described above can be converted among each other
+    using ``1dDW_Grad_o_Mat``. The formats of inputs and outputs are
+    described by the option used, as follows:
+
+    .. _grads_table:
+
+    +---------------------------+---------------------------------------+--------------------------------+
+    |       input/option        |               style                   |       example program          |
+    +===========================+=======================================+================================+
+    | -{in,out}_grad_rows       | row gradients                         | dcm2nii output, TORTOISE input |
+    +---------------------------+---------------------------------------+--------------------------------+
+    | -{in,out}_grad_cols       | column gradients                      | basic input to 3dDWItoDT       |
+    +---------------------------+---------------------------------------+--------------------------------+
+    | -{in,out}_{g,b}matA_cols  | row-first *g*\- or *b*\-matrices      | alt. input to 3dDWItoDT        |
+    +---------------------------+---------------------------------------+--------------------------------+
+    | -{in,out}_{g,b}matT_cols  | diagonal-first *g*\- or *b*\-matrices | TORTOISE output                |
+    +---------------------------+---------------------------------------+--------------------------------+
+
+    |
+
+#.  Additionally, the file of *b*\-values may be input after the
+    ``-in_bvals *`` option.  This might be requisite if converting
+    gradients to *b*\-matrices, for instance.  
+
+    The *b*\-values can also be used to define which associated
+    gradient/matrix entries refer to reference images and which to
+    DWIs; if not input, the program will estimate this based on the
+    magnitudes of the gradients-- those with essentially zero
+    magnitude are treated as reference markers, and the rest are
+    treated as DWI markers.  
+
+    In some acquired data, the reference images actually have a small,
+    nonzero DW factor applied, such as *b*\=5, so that neither the
+    gradient value nor the *b*\-value would be identified as a
+    'reference image'.  In this case, one can use the ``-bmax_ref *``
+    option to input a number below which *b*\-values will be treated
+    as marking reference images.
+
+    .. note:: The great interest in determining which gradient/matrix
+       elements correspond to either reference or DW images comes with
+       the processing of the DW datasets themselves, as described
+       below.  For example, one might want to average together all
+       reference images into one, as well as averaging repeated DWI
+       sets with each other.  This potentially tedious scripting
+       exercise can be slightly automated using the gradient info in
+       ``1dDW_Grad_o_Mat``, as described below in :ref:`GradOpsWithImages`.
+
+    |
+
+#.  In rare cases, one might want to include a row of *b*\-values in
+    the output gradient/matrix file. One example of this is with
+    DSI-Studio for HARDI fitting.  One can enact this behavior using
+    the ``-out_bval_col`` switch .  The first column of the text file
+    will contain the *b*\-values (assuming you either input
+    *b*\-matrices or used ``-in_bvals *``). This option only applies to
+    columnar output.
+   
+    |
+
+#.  By default, ``1dDW_Grad_o_Mat`` will remove gradient/matrix rows
+    corresponding to reference images in the output.  Thus, if one
+    inputs a file with *N* reference and *M* DW images, the output
+    would have the gradients/matrices of just the *M* DW images. To
+    preserve all of the reference values, one can use the
+    ``-keep_b0s`` switch.  To remove all reference values but insert a
+    row of zeros at the top afterward, one can use the
+    ``-put_zeros_top`` switch, instead.
+
+    .. note:: The use of these switches depends on whether one also
+              wants to average reference images together, and whether
+              one wants the number of gradient/matrix entries to be
+              the same as the number of DWI files or not (likely
+              determined by the use of particular DT- or
+              HARDI-estimating programs).
+       
+    |
+    
+.. _GradOpsWithImages:
+
+Simultaneous operations with images
+-----------------------------------
+
+#.  Generally, DWI data are acquired with multiple reference images
+    (*M*\>1), and it might be useful to average these together into a
+    single image (at the start of the file) with higher SNR for the
+    tensor fitting.  The default behavior of locating and removing
+    rows of reference grads/matrices described above can be used to
+    aid this.
+
+    Say one starts with *N*\+\ *M* images and grads/matrices.  One can
+    input the dataset with the option ``-proc_dset *``.  When
+    ``1dDW_Grad_o_Mat`` removes gradients corresponding to the
+    reference images, it will identify simultaneously:
+
+    * the related volumes in the dataset, 
+    * average them together,
+    * and place them as the 0th volume (with the *N* remaining DWIs
+    going from 1..end in their original ordering).
+
+    In this case, the output dataset will have *N*\+1 total volumes
+    (and the output prefix for it is given via the ``-pref_dset *``
+    option).  By default, an output gradient file in this case would
+    have only *N* rows, which would be appropriate for default
+    ``3dDWItoDT`` usage; other programs might require reinserting a
+    row of zeros at the top, parallel to the 0th brick reference
+    image, using ``-put_zeros_top``.
+
+    |
+    
+#.  Occasionally, diffusion data is acquired with multiple repetitions
+    of DWIs.  For example, one might acquire three repetitions of 3
+    *b*\=0 images and 30 *b*\=1000 images, for a total of 99 volumes;
+    and then the 4th, 37th and 70th bricks have been acquired with the
+    same gradient, etc. However, you don't need to do the index math,
+    because ``1dDW_Grad_o_Mat`` can be told to do the averaging among
+    gradients.
