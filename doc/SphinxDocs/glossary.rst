@@ -7,6 +7,17 @@ Glossary
 .. glossary::
    :sorted: 
 
+
+   ROI
+      Region of interest.  In tractography, we try to keep the
+      separate language of 'target ROIs', referring to the set of
+      blobs among which one is looking for connections, and 'WM ROIs',
+      referring to the white matter regions where those connections
+      are.
+
+   WB 
+      Whole brain.
+
    index
    indexing
       A system of referring to an element in an ordered set, such as a
@@ -125,6 +136,15 @@ Glossary
       particularly useful for initial investigations, and the latter
       two utilize the estimated uncertainty of DT parameters to
       provide more robust results.
+
+   tractography coloration 
+
+      In deterministic (and mini-probabilistic) tracking, default
+      tract coloration is RGB (red-green-blue) for segment orientation
+      as follows: **red** for left-right; **green** for
+      anterior-posterior; **blue** for inferior-superior.  If non-RGB
+      coloration is used, then probably the distinct colors refer to
+      connections between different pairs of ROIs.
 
    WM
       White matter.

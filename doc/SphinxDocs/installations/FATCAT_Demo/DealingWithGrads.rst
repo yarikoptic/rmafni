@@ -126,6 +126,41 @@ by the DW factor, *b*.  All the other notations, symmetries and relations
 remain the same, including the distinctions in row- or diagonal-first
 notations.  Of note, TORTOISE uses and outputs a *row-first* *b*\-matrix.
 
+|
+
+The following figure shows a comparison of the same few lines of four
+column output formats:
+
++------------------------------------+----------------------------------------+
+| Grad/matrix selection              |  Style                                 |
++====================================+========================================+
+|.. image:: FlipGrads/GRAD_Grad.png  | gradient file                          |
+|   :width: 130%                     |                                        |
++------------------------------------+----------------------------------------+
+|.. image:: FlipGrads/GRAD_gmatA.png | diagonal-first (AFNI-style)            |
+|   :width: 130%                     | *g*\-matrix                            |
++------------------------------------+----------------------------------------+
+|.. image:: FlipGrads/GRAD_gmatT.png | row-first (TORTOISE-style)             |
+|   :width: 130%                     | *g*\-matrix                            |
++------------------------------------+----------------------------------------+
+|.. image:: FlipGrads/GRAD_bmatT.png | row-first (TORTOISE-style) *b*\-matrix |
+|   :width: 100%                     |                                        |
++------------------------------------+----------------------------------------+
+|One can verify the dyadic gradient-to-matrix element relation by comparing   |
+|values of the uppermost two files (*if* one wants).                          |
+|Note that in the 'diagonal-first' case, the first three columns              |
+|contain only positive (:math:`\geq0`) numbers. This will always be the       |
+|case, since the DT is positive definite, and the property provides a solid   |
+|hint as to the style of a given matrix output.  Columns 0, 2 and 5 are the   |
+|equivalent ones in the 'row-first' cases (and have matching values).         |
+|The factors of two in the columns representing off-diagonal DT               |
+|elements is apparent when comparing the *g*\-matrices. Finally, one          |
+|can see how the *b*\=1000 information translates into the *b*\-matrix        |
+|file by comparing the last two rows.                                         |
++-----------------------------------------------------------------------------+
+
+
+|
 
 Operations (1dDW_Grad_o_Mat)
 ============================
@@ -334,8 +369,8 @@ Flipping Gradients (if necessary)
     V1, V2 and V3 are rotated in space.
 
     For me it is difficult to view eigenvector maps and know what's
-    going on, so I use a quick, whole brain tractography as a way to
-    see that things have gone wrong. The premise is that, since the
+    going on, so I use a quick, whole brain (WB) tractography as a way
+    to see that things have gone wrong. The premise is that, since the
     directionality of most DTs will be wrong, the most basic WM
     features of the brain, such as the corpus callosum, will not look
     correct (NB: if you are working with subjects whose transcallosal
@@ -352,6 +387,8 @@ Flipping Gradients (if necessary)
     simultaneously is equivalent to flipping the third, due to the
     sign change symmetry noted at the beginning of this section).  At
     least this means that only a few combinations need to be tested.
+
+    |
 
 #.  This then begs the questions, how do you know:
     
@@ -370,11 +407,56 @@ Flipping Gradients (if necessary)
 
     Below are sets of images from (bad) data in need of each potential
     kind of flip, as well as a (good) data which has been properly
-    flipped.
+    flipped (from left to right, columns are: fronto-coronal WB;
+    supero-axial WB; supero-axial ROI):
 
-    .. image:: _FlipGrads/UNFLIPPED_1.jpg
-       :width: 30%
-    .. image:: _FlipGrads/UNFLIPPED_2.jpg
-       :width: 30%
-    .. image:: _FlipGrads/UNFLIPPED_3.jpg
-       :width: 30%
+    +------------------------------------+
+    | good:  no relative flip            |
+    +====================================+
+    |.. image:: FlipGrads/UNFLIPPED_3.jpg|
+    |   :width: 32%                      |
+    |.. image:: FlipGrads/UNFLIPPED_1.jpg|
+    |   :width: 32%                      |
+    |.. image:: FlipGrads/UNFLIPPED_2.jpg|
+    |   :width: 32%                      |
+    +------------------------------------+
+
+    +------------------------------------+
+    | bad:  flipped x                    |
+    +====================================+
+    |.. image:: FlipGrads/FLIPPED_X_3.jpg|
+    |   :width: 32%                      |
+    |.. image:: FlipGrads/FLIPPED_X_1.jpg|
+    |   :width: 32%                      |
+    |.. image:: FlipGrads/FLIPPED_X_2.jpg|
+    |   :width: 32%                      |
+    +------------------------------------+
+
+    +------------------------------------+
+    | bad:  flipped y                    |
+    +====================================+
+    |.. image:: FlipGrads/FLIPPED_Y_3.jpg|
+    |   :width: 32%                      |
+    |.. image:: FlipGrads/FLIPPED_Y_1.jpg|
+    |   :width: 32%                      |
+    |.. image:: FlipGrads/FLIPPED_Y_2.jpg|
+    |   :width: 32%                      |
+    +------------------------------------+
+
+    +------------------------------------+
+    | bad:  flipped z                    |
+    +====================================+
+    |.. image:: FlipGrads/FLIPPED_Z_3.jpg|
+    |   :width: 32%                      |
+    |.. image:: FlipGrads/FLIPPED_Z_1.jpg|
+    |   :width: 32%                      |
+    |.. image:: FlipGrads/FLIPPED_Z_2.jpg|
+    |   :width: 32%                      |
+    +------------------------------------+
+
+    As seen above, several of the badly flipped sets have (among other
+    detrimental features) variously missing corpus
+    callosum/genu/splenium/cingulate tracts, poor WB coverage, and
+    oddly spiking (blue) tracts in the superior region (known as the
+    **bad hair day** effect).  These are in contrast with the nice,
+    full cauliflower that is the well flipped set in the top row.
