@@ -1,8 +1,8 @@
 .. _DealingWithGrads:
 
-======================
-Dealing with gradients
-======================
+=========================
+Dealing with DW gradients
+=========================
 
 .. contents::
    :depth: 3
@@ -213,8 +213,8 @@ Gradient and matrix information
     
 .. _GradOpsWithImages:
 
-Simultaneous operations with images
------------------------------------
+Simultaneous averaging of datasets
+----------------------------------
 
 #.  Generally, DWI data are acquired with multiple reference images
     (*M*\>1), and it might be useful to average these together into a
@@ -231,7 +231,7 @@ Simultaneous operations with images
     * the related volumes in the dataset, 
     * average them together,
     * and place them as the 0th volume (with the *N* remaining DWIs
-    going from 1..end in their original ordering).
+      going from 1..end in their original ordering).
 
     In this case, the output dataset will have *N*\+1 total volumes
     (and the output prefix for it is given via the ``-pref_dset *``
@@ -248,11 +248,112 @@ Simultaneous operations with images
     *b*\=0 images and 30 *b*\=1000 images, for a total of 102 volumes;
     in that case, the 5th, 39th and 73rd bricks will have been
     acquired with the same gradient, etc. However, *you*, the
-    analyzer, don't need to do the index math, because
+    analyzer, don't need to do the index math in scripts, because
     ``1dDW_Grad_o_Mat`` can be told to do the appropriate averaging
     among gradients (along with the averaging of the reference images,
     described in the previous section).
 
+    The way to signal ``1dDW_Grad_o_Mat`` to average sets of DWIs is
+    to use the ``-dwi_comp_fac *`` to enter the 'compression factor'.
+    In this case, with three repeated DWI sets, one would use
+    ``-dwi_comp_fac 3`` (and would be so even if the number of
+    reference images weren't constant-- this refers only to the DWIs
+    themselves). If both the reference images and DWIs are
+    respectively averaged, the final data set will have 31 volumes
+    (reference one first); with no other flags there would be 30
+    gradients, while if using ``-put_zeros_top`` there would be 31.
     
+    .. note:: When entering a DWI compression factor, there is a bit
+              of an internal check with dot products of the gradients
+              to see if they really are the same gradient repeated,
+              and a warning will appear if they don't seem similar
+              enough.
 
+    |
 
+.. _FlippingGrads:
+
+Flipping Gradients (if necessary)
+---------------------------------
+
+.. warning:: This is an annoying feature of DWI/DTI processing.
+             Probably my least favorite aspect. But it's also quite
+             important to understand and deal with (hopefully just
+             once at the beginning of a study).
+
+#.  Preface I: mathematically, there are a lot of symmetries in the
+    diffusion tensor model (and also in HARDI ones, for that matter).
+    A consequence of this is that using a gradient, :math:`\mathbf{g}
+    = (g_x, g_y, g_z)`, or its negative, :math:`\mathbf{-g} = (-g_x,
+    -g_y, -g_z)`, makes absolutely no difference in the model
+    fitting-- the resulting tensor will look the same. (NB: this
+    equanimity is *not* referring to twice refocused spin-echo EPI or
+    any sequence features-- purely to post-acquisition analysis.)
+
+    |
+
+#.  Preface II: the scanner has its own set of coordinate axes, and
+    this determines each dataset's origin and orientation (all of
+    which can by reading the file's header information, e.g.,
+    ``3dinfo -o3 -orient FILE``).  The scanner axes also determine the
+    values of the DW gradient/matrix components, both their magnitude
+    and sign.  
+
+    |
+
+#.  The issue at hand: for some unbeknownst reason, after converting
+    diffusion data from dicom to an analyzable format (such as NIFTI
+    or BRIK/HEAD), **the gradient values often don't match well with
+    the dataset values.** Specifically, *there is a systematic sign
+    change in the recorded gradient components, relative to the
+    recorded dataset.* The problem takes the following form: a single
+    component of each gradient has had its sign *flipped* in the
+    output file (always the same gradient per file)-- for example,
+    :math:`g_y \rightarrow -g_y`.
+
+    This is quite an annoying thing to have happen. Furthermore, it
+    appears to be dependent as well on the programs used (they somehow
+    have separate conventions at times). Fortunately:
+    
+    * it is pretty straightforward to determine when gradients and
+      data are 'unmatched';
+    * there's something that can be done to fix the problem,
+      relatively simply; and
+    * usually, once you determine the fix for one subject's data set,
+      the rest of the data from the same scanner+protocol follows
+      suit.    
+
+    |
+    
+#.  The sign flip does **not** affect the scalar DT parameter values
+    such as FA, MD, RD, L1, and all others related purely to size and
+    shape, due to mathematical symmetries in the DT (and HARDI)
+    models.  Therefore, its presence cannot be noticed by looking at
+    these scalar maps.  However, the sign flip **does** affect the
+    directionality of the modeled shapes, meaning that eigenvectors
+    V1, V2 and V3 are rotated in space.
+
+    For me it is difficult to view eigenvector maps and know what's
+    going on, so I use a quick, whole brain tractography as a way to
+    see that things have gone wrong. The premise is that, since the
+    directionality of most DTs will be wrong, the most basic WM
+    features of the brain, such as the corpus callosum, will not look
+    correct (NB: if you are working with subjects whose transcallosal
+    fibers may be highly nonstandard, I suggest using a control
+    subject for checking about gradient flips).
+
+    |
+
+#.  The solution: flip back! ``1dDW_Grad_o_Mat`` contains switches to
+    flip each component (even if one is using matrix formats instead
+    of gradients, these apply): ``-flip_x``, ``-flip_y``, and
+    ``-flip_z``.  These can be applied individually (mathematically in
+    DTI/HARDI models, flipping any two grads simultaneously is
+    equivalent to flipping the third, due to the sign change symmetry
+    noted at the beginning of this section).  At least this means that
+    only a few combinations need to be tested.
+
+    How do you know:
+    
+    * when you need to perform flipping, and
+    * when you have found the correct flipping to do with your data?
