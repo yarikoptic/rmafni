@@ -126,38 +126,41 @@ by the DW factor, *b*.  All the other notations, symmetries and relations
 remain the same, including the distinctions in row- or diagonal-first
 notations.  Of note, TORTOISE uses and outputs a *row-first* *b*\-matrix.
 
-|
 
 The following figure shows a comparison of the same few lines of four
 column output formats:
+
+.. tabularcolumns:: |l|l|
 
 +------------------------------------+----------------------------------------+
 | Grad/matrix selection              |  Style                                 |
 +====================================+========================================+
 |.. image:: FlipGrads/GRAD_Grad.png  | gradient file                          |
-|   :width: 130%                     |                                        |
+|   :width: 4in                      |                                        |
 +------------------------------------+----------------------------------------+
-|.. image:: FlipGrads/GRAD_gmatA.png | diagonal-first (AFNI-style)            |
-|   :width: 130%                     | *g*\-matrix                            |
+|.. image:: FlipGrads/GRAD_gmatA.png | diagonal-first (AFNI-style) *g*\-matrix|
+|   :width: 4in                      |                                        |
 +------------------------------------+----------------------------------------+
-|.. image:: FlipGrads/GRAD_gmatT.png | row-first (TORTOISE-style)             |
-|   :width: 130%                     | *g*\-matrix                            |
+|.. image:: FlipGrads/GRAD_gmatT.png | row-first (TORTOISE-style) *g*\-matrix |
+|   :width: 4in                      |                                        |
 +------------------------------------+----------------------------------------+
 |.. image:: FlipGrads/GRAD_bmatT.png | row-first (TORTOISE-style) *b*\-matrix |
-|   :width: 100%                     |                                        |
+|   :width: 4in                      |                                        |
 +------------------------------------+----------------------------------------+
-|One can verify the dyadic gradient-to-matrix element relation by comparing   |
-|values of the uppermost two files (*if* one wants).                          |
-|Note that in the 'diagonal-first' case, the first three columns              |
-|contain only positive (:math:`\geq0`) numbers. This will always be the       |
-|case, since the DT is positive definite, and the property provides a solid   |
-|hint as to the style of a given matrix output.  Columns 0, 2 and 5 are the   |
-|equivalent ones in the 'row-first' cases (and have matching values).         |
-|The factors of two in the columns representing off-diagonal DT               |
-|elements is apparent when comparing the *g*\-matrices. Finally, one          |
-|can see how the *b*\=1000 information translates into the *b*\-matrix        |
-|file by comparing the last two rows.                                         |
-+-----------------------------------------------------------------------------+
+
+
+One can verify the dyadic gradient-to-matrix element relation by
+comparing values of the uppermost two files (*if* one wants).  Note
+that in the 'diagonal-first' case, the first three columns contain
+only positive (:math:`\geq0`) numbers. This will always be the case,
+since the DT is positive definite, and the property provides a solid
+hint as to the style of a given matrix output.  Columns 0, 2 and 5 are
+the equivalent ones in the 'row-first' cases (and have matching
+values).  The factors of two in the columns representing off-diagonal
+DT elements is apparent when comparing the *g*\-matrices. Finally, one
+can see how the *b*\=1000 information translates into the *b*\-matrix
+file by comparing the last two rows.
+
 
 
 |
@@ -187,7 +190,7 @@ Gradient and matrix information
     | -{in,out}_{g,b}matT_cols  | diagonal-first *g*\- or *b*\-matrices | TORTOISE output                |
     +---------------------------+---------------------------------------+--------------------------------+
 
-    |
+
 
 #.  Additionally, the file of *b*\-values may be input after the
     ``-in_bvals *`` option.  This might be requisite if converting
@@ -216,7 +219,7 @@ Gradient and matrix information
        exercise can be slightly automated using the gradient info in
        ``1dDW_Grad_o_Mat``, as described below in :ref:`GradOpsWithImages`.
 
-    |
+    
 
 #.  In rare cases, one might want to include a row of *b*\-values in
     the output gradient/matrix file. One example of this is with
@@ -226,7 +229,7 @@ Gradient and matrix information
     *b*\-matrices or used ``-in_bvals *``). This option only applies to
     columnar output.
    
-    |
+    
 
 #.  By default, ``1dDW_Grad_o_Mat`` will remove gradient/matrix rows
     corresponding to reference images in the output.  Thus, if one
@@ -284,7 +287,7 @@ Simultaneous averaging of datasets
               your pipeline, both for reference images here and for
               DWIs (described below).
 
-    |
+    
     
 #.  Occasionally, diffusion data is acquired with multiple repetitions
     of DWIs.  For example, one might acquire three repetitions of 4
@@ -333,7 +336,7 @@ Flipping Gradients (if necessary)
     equanimity is *not* referring to twice refocused spin-echo EPI or
     any sequence features-- purely to post-acquisition analysis.)
 
-    |
+    
 
 #.  Preface II: the scanner has its own set of coordinate axes, and
     this determines each dataset's origin and orientation (all of
@@ -342,7 +345,7 @@ Flipping Gradients (if necessary)
     values of the DW gradient/matrix components, both their magnitude
     and sign.  
 
-    |
+    
 
 #.  The issue at hand: for some unbeknownst reason, after converting
     diffusion data from dicom to an analyzable format (such as NIFTI
@@ -366,7 +369,7 @@ Flipping Gradients (if necessary)
       the rest of the data from the same scanner+protocol follows
       suit.    
 
-    |
+    
     
 #.  The sign flip does **not** affect the scalar DT parameter values
     such as FA, MD, RD, L1, and all others related purely to size and
@@ -385,7 +388,7 @@ Flipping Gradients (if necessary)
     fibers may be highly nonstandard, I suggest using a control
     subject for checking about gradient flips).
 
-    |
+    
 
 #.  The solution: flip back against the system! ``1dDW_Grad_o_Mat``
     contains switches to flip each component (even if one is using
@@ -396,7 +399,7 @@ Flipping Gradients (if necessary)
     sign change symmetry noted at the beginning of this section).  At
     least this means that only a few combinations need to be tested.
 
-    |
+    
 
 #.  This then begs the questions, how do you know:
     
@@ -420,49 +423,34 @@ Flipping Gradients (if necessary)
     supero-axial WB; supero-axial ROI (spherical mask located in the
     genu and anterior cingulum bundle):
 
-    +------------------------------------+
-    | good:  no relative flip            |
-    +====================================+
-    |.. image:: FlipGrads/UNFLIPPED_2.jpg|
-    |   :width: 32%                      |
-    |.. image:: FlipGrads/UNFLIPPED_1.jpg|
-    |   :width: 32%                      |
-    |.. image:: FlipGrads/UNFLIPPED_3.jpg|
-    |   :width: 32%                      |
-    +------------------------------------+
 
-    +------------------------------------+
-    | bad:  flipped x                    |
-    +====================================+
-    |.. image:: FlipGrads/FLIPPED_X_2.jpg|
-    |   :width: 32%                      |
-    |.. image:: FlipGrads/FLIPPED_X_1.jpg|
-    |   :width: 32%                      |
-    |.. image:: FlipGrads/FLIPPED_X_3.jpg|
-    |   :width: 32%                      |
-    +------------------------------------+
+    +------------------------------------+------------------------------------+------------------------------------+
+    | good:  no relative flip                                                                                      |
+    +====================================+====================================+====================================+
+    |.. image:: FlipGrads/UNFLIPPED_2.jpg|.. image:: FlipGrads/UNFLIPPED_1.jpg|.. image:: FlipGrads/UNFLIPPED_3.jpg|
+    |   :width: 100%                     |   :width: 100%                     |   :width: 100%                     |
+    +------------------------------------+------------------------------------+------------------------------------+
 
-    +------------------------------------+
-    | bad:  flipped y                    |
-    +====================================+
-    |.. image:: FlipGrads/FLIPPED_Y_2.jpg|
-    |   :width: 32%                      |
-    |.. image:: FlipGrads/FLIPPED_Y_1.jpg|
-    |   :width: 32%                      |
-    |.. image:: FlipGrads/FLIPPED_Y_3.jpg|
-    |   :width: 32%                      |
-    +------------------------------------+
+    +------------------------------------+------------------------------------+------------------------------------+
+    | bad:  flipped x                                                                                              |
+    +====================================+====================================+====================================+
+    |.. image:: FlipGrads/FLIPPED_X_2.jpg|.. image:: FlipGrads/FLIPPED_X_1.jpg|.. image:: FlipGrads/FLIPPED_X_3.jpg|
+    |   :width: 100%                     |   :width: 100%                     |   :width: 100%                     |
+    +------------------------------------+------------------------------------+------------------------------------+
 
-    +------------------------------------+
-    | bad:  flipped z                    |
-    +====================================+
-    |.. image:: FlipGrads/FLIPPED_Z_2.jpg|
-    |   :width: 32%                      |
-    |.. image:: FlipGrads/FLIPPED_Z_1.jpg|
-    |   :width: 32%                      |
-    |.. image:: FlipGrads/FLIPPED_Z_3.jpg|
-    |   :width: 32%                      |
-    +------------------------------------+
+    +------------------------------------+------------------------------------+------------------------------------+
+    | bad:  flipped y                                                                                              |
+    +====================================+====================================+====================================+
+    |.. image:: FlipGrads/FLIPPED_Y_2.jpg|.. image:: FlipGrads/FLIPPED_Y_1.jpg|.. image:: FlipGrads/FLIPPED_Y_3.jpg|
+    |   :width: 100%                     |   :width: 100%                     |   :width: 100%                     |
+    +------------------------------------+------------------------------------+------------------------------------+
+
+    +------------------------------------+------------------------------------+------------------------------------+
+    | bad:  flipped z                                                                                              |
+    +====================================+====================================+====================================+
+    |.. image:: FlipGrads/FLIPPED_Z_2.jpg|.. image:: FlipGrads/FLIPPED_Z_1.jpg|.. image:: FlipGrads/FLIPPED_Z_3.jpg|
+    |   :width: 100%                     |   :width: 100%                     |   :width: 100%                     |
+    +------------------------------------+------------------------------------+------------------------------------+
 
     As seen above, several of the badly flipped sets have (among other
     detrimental features) variously missing corpus
@@ -476,8 +464,8 @@ Flipping Gradients (if necessary)
 
     .. note:: Anecdotally, it seems that data from Siemens scanners
               often requires a ``-flip_y`` when using ``3dTrackID``.
-              However, it is always worth checking yourself at the
-              start of a study.
+              However, it is always worth using a WB tracking run at
+              the start of a study in order to check for yourself.
 
     |
 
