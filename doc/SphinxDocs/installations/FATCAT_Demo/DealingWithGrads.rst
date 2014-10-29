@@ -552,9 +552,10 @@ volumes with *b*\=0 and a repeated 30 DW volumes (same gradients) with
     #. Consider the same data acquisition and file naming conventions
        as above, but where the reference volumes were actually
        acquired with small but nonzero DW factors *b*\=5. Then, there
-       are no '0 0 0' gradients, and we have to look where *b*\-values
-       are <6, for example.  The following produces a gradient file
-       with 60 rows and a dataset with 61 volumes::
+       are no '0 0 0' gradients, and to determined reference volumes,
+       we instead have to look where *b*\-values are <6, for example.
+       The following produces a gradient file with 60 rows and a
+       dataset with 61 volumes::
 
          1dDW_Grad_o_Mat -in_grad_rows ALL.bvec    \
             -in_bvals ALL.bval                     \
