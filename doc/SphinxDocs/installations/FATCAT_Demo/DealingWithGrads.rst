@@ -276,6 +276,14 @@ Simultaneous averaging of datasets
     row of zeros at the top, parallel to the 0th brick reference
     image, using ``-put_zeros_top``.
 
+    .. note:: There are currently no 'corrective' steps taken in
+              ``1dDW_Grad_o_Mat``.  The assumption is that you, the
+              user, have performed any corrections for motion, eddy
+              currents, EPI distortions, et al. Therefore, you must
+              consider the appropriateness of averaging volumes in
+              your pipeline, both for reference images here and for
+              DWIs (described below).
+
     |
     
 #.  Occasionally, diffusion data is acquired with multiple repetitions
@@ -407,50 +415,52 @@ Flipping Gradients (if necessary)
 
     Below are sets of images from (bad) data in need of each potential
     kind of flip, as well as a (good) data which has been properly
-    flipped (from left to right, columns are: fronto-coronal WB;
-    supero-axial WB; supero-axial ROI):
+    flipped.  From left to right, columns show the following
+    tractographic views of the same data set: fronto-coronal WB;
+    supero-axial WB; supero-axial ROI (spherical mask located in the
+    genu and anterior cingulum bundle):
 
     +------------------------------------+
     | good:  no relative flip            |
     +====================================+
-    |.. image:: FlipGrads/UNFLIPPED_3.jpg|
+    |.. image:: FlipGrads/UNFLIPPED_2.jpg|
     |   :width: 32%                      |
     |.. image:: FlipGrads/UNFLIPPED_1.jpg|
     |   :width: 32%                      |
-    |.. image:: FlipGrads/UNFLIPPED_2.jpg|
+    |.. image:: FlipGrads/UNFLIPPED_3.jpg|
     |   :width: 32%                      |
     +------------------------------------+
 
     +------------------------------------+
     | bad:  flipped x                    |
     +====================================+
-    |.. image:: FlipGrads/FLIPPED_X_3.jpg|
+    |.. image:: FlipGrads/FLIPPED_X_2.jpg|
     |   :width: 32%                      |
     |.. image:: FlipGrads/FLIPPED_X_1.jpg|
     |   :width: 32%                      |
-    |.. image:: FlipGrads/FLIPPED_X_2.jpg|
+    |.. image:: FlipGrads/FLIPPED_X_3.jpg|
     |   :width: 32%                      |
     +------------------------------------+
 
     +------------------------------------+
     | bad:  flipped y                    |
     +====================================+
-    |.. image:: FlipGrads/FLIPPED_Y_3.jpg|
+    |.. image:: FlipGrads/FLIPPED_Y_2.jpg|
     |   :width: 32%                      |
     |.. image:: FlipGrads/FLIPPED_Y_1.jpg|
     |   :width: 32%                      |
-    |.. image:: FlipGrads/FLIPPED_Y_2.jpg|
+    |.. image:: FlipGrads/FLIPPED_Y_3.jpg|
     |   :width: 32%                      |
     +------------------------------------+
 
     +------------------------------------+
     | bad:  flipped z                    |
     +====================================+
-    |.. image:: FlipGrads/FLIPPED_Z_3.jpg|
+    |.. image:: FlipGrads/FLIPPED_Z_2.jpg|
     |   :width: 32%                      |
     |.. image:: FlipGrads/FLIPPED_Z_1.jpg|
     |   :width: 32%                      |
-    |.. image:: FlipGrads/FLIPPED_Z_2.jpg|
+    |.. image:: FlipGrads/FLIPPED_Z_3.jpg|
     |   :width: 32%                      |
     +------------------------------------+
 
@@ -458,5 +468,97 @@ Flipping Gradients (if necessary)
     detrimental features) variously missing corpus
     callosum/genu/splenium/cingulate tracts, poor WB coverage, and
     oddly spiking (blue) tracts in the superior region (known as the
-    **bad hair day** effect).  These are in contrast with the nice,
-    full cauliflower that is the well flipped set in the top row.
+    **bad hair day** effect). In practice, the y-flip might be the
+    least obvious to detect at first glance, but several features are
+    different-- for instance, the genu and splenium are missing.  The
+    badly flipped images are in contrast with the nice, full
+    quasi-cauliflower that is the well flipped set in the top row.
+
+    .. note:: Anecdotally, it seems that data from Siemens scanners
+              often requires a ``-flip_y`` when using ``3dTrackID``.
+              However, it is always worth checking yourself at the
+              start of a study.
+
+    |
+
+Example commands
+----------------
+
+Consider a case where ``dcm2nii`` has been used to convert data from a
+DWI acquisition, resulting in: a NIFTI file called ``ALL.nii.gz``; a
+row gradient file called ``ALL.bvec``; and a (row) *b*\-value file
+called ``ALL.bval``.  Let's say that the acquisition aquired: 4 *b*\=0
+reference images; then 30 DW images with *b*\=1000; then another 2
+volumes with *b*\=0 and a repeated 30 DW volumes (same gradients) with
+*b*\=1000.  To start, there are a total of 66 volumes. Then:
+
+    #. The following produces a gradient file with 3 columns and 66
+       rows::
+
+         1dDW_Grad_o_Mat -in_grad_rows ALL.bvec    \
+            -out_grad_cols GRAD_ALL.dat            \
+            -keep_b0s
+
+    #. The following flips the y-component of the input DW gradients
+       and produces a row-first *b*\-matrix file with 66 rows::
+
+         1dDW_Grad_o_Mat -in_grad_rows ALL.bvec    \
+            -in_bvals ALL.bval                     \
+            -out_bmatT_cols BMAT_ALL.dat           \
+            -keep_b0s                              \
+            -flip_y
+
+       
+
+    #. The following produces a gradient file with 3 columns and 60
+       rows (reference grads are not kept), and a dataset with 61
+       volumes (reference images have been averaged, with the
+       resulting volume at brick [0])::
+
+         1dDW_Grad_o_Mat -in_grad_rows ALL.bvec    \
+            -out_grad_cols GRAD_allDWI.dat         \
+            -proc_dset ALL.nii.gz                  \
+            -pref_dset AVEB0_allDWI.nii.gz
+
+    #. The following adds DWI averaging to the previous command,
+       producing a grad file of 30 rows and a dataset with 31
+       volumes::
+
+         1dDW_Grad_o_Mat -in_grad_rows ALL.bvec    \
+            -out_grad_cols GRAD_aveDWI.dat         \
+            -dwi_comp_fac 2                        \
+            -proc_dset ALL.nii.gz                  \
+            -pref_dset AVEB0_aveDWI.nii.gz
+
+    #. The following first selects only the first 25 acquisitions (for
+       example, if motion had occured), averages the reference images,
+       and puts a row of zeros at the top of the file; therefore, the
+       output grad file has 22 columns (four reference images averaged
+       to 1, plus the remaining 21 DWIs), as does the output dataset::
+
+         1dDW_Grad_o_Mat -in_grad_rows ALL.bvec'[0..24]'  \
+            -out_grad_cols GRAD_mot25.dat                 \
+            -proc_dset ALL.nii.gz'[0..24]'                \
+            -pref_dset AVEB0_mot25.nii.gz                 \
+            -put_zeros_top
+
+       .. note:: Subset selection works similarly as in other AFNI
+                 programs, both for datasets and the row/column
+                 files. For row text files, one uses square-brackets
+                 '[*i*..\ *j*\]' to select the gradients *i* to
+                 *j*. For column text files, one would do the same
+                 using curly brackets '{*i*..\ *j*}'.
+
+    #. Consider the same data acquisition and file naming conventions
+       as above, but where the reference volumes were actually
+       acquired with small but nonzero DW factors *b*\=5. Then, there
+       are no '0 0 0' gradients, and we have to look where *b*\-values
+       are <6, for example.  The following produces a gradient file
+       with 60 rows and a dataset with 61 volumes::
+
+         1dDW_Grad_o_Mat -in_grad_rows ALL.bvec    \
+            -in_bvals ALL.bval                     \
+            -bmax_ref 6                            \
+            -out_grad_cols GRAD_allDWI.dat         \
+            -proc_dset ALL.nii.gz                  \
+            -pref_dset AVEB0_allDWI.nii.gz
