@@ -1,15 +1,15 @@
 .. _FATCAT_All:
 
 
-===============
+***************
 FATCAT Commands
-===============
+***************
 
 .. contents::
    :depth: 3
 
 Overview
---------
+========
 
 The Functional And Tractographic Connectivity Toolbox (FATCAT)
 contains several programs for processing and analyzing MRI data, in
@@ -52,7 +52,7 @@ questions that come up during analysis.  It is also a good first port
 of call for asking new questions that you yourself might have.
 
 Demo data sets and scripts
---------------------------
+==========================
 
 Demo sets are provided for getting acquainted with FATCAT
 capabilities. Each demo set contains both data and scripts-- the
@@ -77,7 +77,7 @@ network properties), run the following in a terminal::
 Further online documentation for this is forthcoming...
 
 Other
------
+=====
 
 Currently, *preprocessing* steps (such as corrections for outliers,
 subject motion, induced eddy currents and magnetic susceptibility) are
