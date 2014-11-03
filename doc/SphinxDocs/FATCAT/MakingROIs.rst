@@ -84,11 +84,14 @@ Broadly, ``3dROIMaker`` can be used to:
   further expansion, thresholding, etc. (``-preinfl_inset *``,
   ``-preinfl_inflate *``)
 
-Each ROI is defined as a set of voxels with a given integer value
-within dataset volume.  Additionally, this information can be combined
-with (NIML-formatted) labeltables to allow for text-labels to be
-associated with each ROI. These labeltable names can track through to
-further analysis programs, such as ``3dNetCorr`` and ``3dTrackID``.
+Each ROI is defined as a set of voxels with a given nonzero integer
+value within dataset volume (typically, the integers are >0, though
+for tractography purposes, negative voxel values show where
+*anti-masks* that exclude tracts are located).  Additionally, this
+information can be combined with (NIML-formatted) labeltables to allow
+for text-labels to be associated with each ROI. These labeltable names
+can track through to further analysis programs, such as ``3dNetCorr``
+and ``3dTrackID``.
 
 
 .. note:: In general, it should be possible to do much of the ROI
@@ -101,8 +104,8 @@ further analysis programs, such as ``3dNetCorr`` and ``3dTrackID``.
           don't help to keep analysis scripts short, then please
           enquire before spending ages on complicated pipelines.
 
-Important notes
----------------
+**Important notes**
+-------------------
 
 #.  If mapping ``3dROIMaker``\-produced output files to another space
     (for example, from standard to DTI), then one can make sure that
