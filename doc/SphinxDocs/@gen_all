@@ -2,6 +2,9 @@
 
 @global_parse `basename $0` "$*" ; if ($status) exit 0
 
+set afscp = afni.nimh.nih.gov:/var/www/html/pub/dist/doc/sphinx.test.html
+set afwpg = http://afni.nimh.nih.gov/pub/dist/doc/sphinx.test.html
+
 if ("$1" == "") then
    goto HELP
 endif
@@ -80,10 +83,10 @@ make clean html |& tee -a ___build.log
 
 UPLOAD:
 if ($webupdate == 1) then
-   echo "Enter 'y' to send _build/html to $apage y/[N]:"
+   echo "Enter 'y' to send _build/html to $afwpg y/[N]:"
    set kk = $<
    if ("$kk" == 'y' || "$kk" == 'Y') then
-      rsync -r _build/html $afscp
+      rsync -rv _build/html/ $afscp
    endif
    echo "Content updated for $afwpg"
 endif
@@ -96,8 +99,6 @@ PARSE:
 	set cnt = 1
    set nosuma = 0
    set webupdate = 0
-   set afscp = afni.nimh.nih.gov:/var/www/html/pub/dist/doc/sphinx.test.html
-   set afwpg = http://afni.nimh.nih.gov/pub/dist/doc/sphinx.test.html
    while ($cnt <= $Narg)
       if ("$argv[$cnt]" == "-d" || "$argv[$cnt]" == "-echo") then
          set verb = 1
@@ -140,6 +141,12 @@ HELP:
    echo "      make html"
    echo "or"
    echo "      make clean html"
+   echo ""
+   echo "Options:"
+   echo "-h: This message"
+   echo "-no_suma: Do not regenerate SUMA's auto docs."
+   echo "-web_upload: Send new build to $afwpg"
+   echo "-echo: Yap yap"
    echo ""
    goto END
 
