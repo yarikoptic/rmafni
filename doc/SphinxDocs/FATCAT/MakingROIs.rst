@@ -151,7 +151,11 @@ Getting to know your neighbors
 ------------------------------
 
 An important consideration in determining ROIs is how a *neighborhood*
-is defined at a voxel level.  
+is defined at a voxel level. For most applications, these are
+symmetric around a given voxel (though, near the edge of a dataset or
+mask it may be clipped).  The categories are typically described in
+terms of what basic features must be shared in order to make two
+voxels neighbors: nodes, edges or faces.
 
 Different software packages have different default definitions of a
 voxel neighborhood.  The three main categories are:
