@@ -8,8 +8,8 @@ SHELL		= /bin/sh
 
 
 # Installation Directories:
-SRCDIR		= /Users/rwcox/AFNI/src/netcdf-3.5.0/src
-prefix		= /Users/rwcox/AFNI/src/netcdf-3.5.0
+SRCDIR		= /Users/ziad/AFNI/src/netcdf-3.5.0/src
+prefix		= /Users/ziad/AFNI/src/netcdf-3.5.0
 exec_prefix	= $(prefix)
 INCDIR		= $(exec_prefix)/include
 LIBDIR		= $(exec_prefix)/lib
