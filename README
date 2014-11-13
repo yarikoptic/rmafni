@@ -61,3 +61,5 @@ To make and install everything, but keep *.o files, do
 
 If you add a new program, you need to add a rule for it in Makefile.INCLUDE;
 just take a look at the rules that already exist.
+
+At the end -- do not forget that NeuroDebian is the best of all
